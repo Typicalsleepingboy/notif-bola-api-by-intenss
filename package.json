@@ -1,0 +1,17 @@
+{
+  "name": "notifbola-api-by-typicalsleepingboy",
+  "version": "9.0.0",
+  "description": "gak tau lah intinya api notif bola by intens",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "moment": "^2.30.1",
+    "undici": "^6.19.8"
+  }
+}
