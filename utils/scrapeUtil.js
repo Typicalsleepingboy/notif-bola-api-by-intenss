@@ -1,5 +1,5 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
+const cheerio = require("cheerio");
 const moment = require('moment'); 
 
 async function scrapeJadwal() {
