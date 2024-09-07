@@ -4,7 +4,7 @@ const { sendLogToDiscord } = require('../logger/discordlogger');
 
 const router = express.Router();
 
-router.get('/jadwalbolagan', async (req, res) => {
+router.get('/jadwalbola', async (req, res) => {
     try {
         const jadwalData = await scrapeJadwal();
         await sendLogToDiscord('Jadwal bola berhasil di-scrape dan dikirimkan ke user.', 'Info', {

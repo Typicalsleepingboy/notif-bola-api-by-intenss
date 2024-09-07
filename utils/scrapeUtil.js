@@ -57,7 +57,6 @@ async function scrapeJadwal() {
         };
     } catch (error) {
         console.error('Error fetching schedule:', error.message);
-        // Return error response
         return {
             status: 500,
             message: 'Gagal mengambil jadwal',
