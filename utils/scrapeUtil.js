@@ -1,22 +1,23 @@
 const axios = require('axios');
-const cheerio = require("cheerio");
-const moment = require('moment'); 
+const moment = require('moment');
+const { JSDOM } = require('jsdom');
 
 async function scrapeJadwal() {
     try {
         const url = 'https://www.goal.com/id/berita/jadwal-siaran-langsung-sepakbola/1qomojcjyge9n1nr2voxutdc1n';
         const { data } = await axios.get(url);
-        const $ = cheerio.load(data);
+        const dom = new JSDOM(data);
+        const document = dom.window.document;
 
-        const tanggalElements = $('h3 strong');
-        const rows = $('table tbody tr');
+        const tanggalElements = document.querySelectorAll('h3 strong');
+        const rows = document.querySelectorAll('table tbody tr');
 
         let jadwal = [];
         let tanggalTerdekat = null;
         let tanggalTerdekatDiff = Infinity;
 
-        tanggalElements.each((index, element) => {
-            const tanggal = $(element).text().trim();
+        tanggalElements.forEach((element) => {
+            const tanggal = element.textContent.trim();
             const tanggalMoment = moment(tanggal, 'DD MMMM YYYY');
 
             const tanggalDiff = Math.abs(tanggalMoment.diff(moment(), 'days'));
@@ -27,32 +28,31 @@ async function scrapeJadwal() {
             }
         });
 
-        rows.each((index, element) => {
-            const time = $(element).find('td').eq(0).text().trim();
-            const match = $(element).find('td').eq(1).text().trim();
-            const competition = $(element).find('td').eq(2).text().trim();
-            const tvStation = $(element).find('td').eq(3).text().trim();
+        rows.forEach((element) => {
+            const cells = element.querySelectorAll('td');
+            if (cells.length >= 4) {
+                const time = cells[0].textContent.trim();
+                const match = cells[1].textContent.trim();
+                const competition = cells[2].textContent.trim();
+                const tvStation = cells[3].textContent.trim();
 
-            const waktuMulai = moment(time, 'HH:mm');
-            const waktuSekarang = moment();
-
-            jadwal.push({
-                time,
-                match,
-                competition,
-                tvStation
-            });
+                jadwal.push({
+                    time,
+                    match,
+                    competition,
+                    tvStation
+                });
+            }
         });
 
-        jadwal.sort((a, b) => a.waktuDiff - b.waktuDiff);
-
+        jadwal.sort((a, b) => moment(a.time, 'HH:mm').diff(moment(b.time, 'HH:mm')));
 
         return {
             status: 200,
             message: 'Berhasil mengambil jadwal',
             data: {
                 date: tanggalTerdekat,
-                schedule: jadwal[0] || {} 
+                schedule: jadwal[0] || {}
             }
         };
     } catch (error) {
